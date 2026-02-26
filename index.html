@@ -1,1 +1,1028 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <link rel="icon" href="kimsze_sharp16.ico" type="image/x-icon">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lim Kim Sze — P3 Mathematics Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;500;700&display=swap" rel="stylesheet">
 
+  <style>
+    :root{
+      --bg:#02060a;
+      --bg2:#030b10;
+      --ink:#f5fff9;
+      --ink2:#c9ffe7;
+
+      --grid:rgba(34, 255, 143, .08);
+      --neon:#22ff8f;
+      --neon2:#00e5ff;
+
+      --gold:#ffd24e;
+      --amber:#ff9f1f;
+      --greenMoney:#18c447;
+      --deepGreen:#0a6a21;
+
+      --card:#071013cc;
+      --cardLine:rgba(34,255,143,.22);
+
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --radius:18px;
+
+      --btnBg:rgba(34,255,143,.12);
+      --btnLine:rgba(34,255,143,.55);
+
+      --yellow:#fde047;
+      --yellowLine:#f59e0b;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--ink);
+      font-family:Lexend,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(900px 600px at 15% 10%, rgba(34,255,143,.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 15%, rgba(0,229,255,.10), transparent 55%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      background-attachment: fixed;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      background:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size:44px 44px;
+      opacity:.35;
+      pointer-events:none;
+      mix-blend-mode:screen;
+      z-index:0;
+    }
+    body::after{
+      content:"";
+      position:fixed; inset:-60px;
+      background:radial-gradient(closest-side, transparent 55%, rgba(0,0,0,.55));
+      pointer-events:none;
+      z-index:0;
+    }
+
+    /* money rain canvas */
+    #rain{
+      position:fixed; inset:0;
+      z-index:0;
+      pointer-events:none;
+      opacity:.9;
+      display:block;
+    }
+
+    header{
+      padding:34px 16px 16px;
+      text-align:center;
+      position:relative;
+      z-index:1;
+    }
+    header h1{
+      margin:0 0 10px;
+      font-size:clamp(1.65rem, 2.8vw, 2.45rem);
+      letter-spacing:.6px;
+      text-shadow:0 0 18px rgba(255,210,78,.18);
+    }
+    header p{
+      margin:0;
+      color:rgba(201,255,231,.88);
+    }
+
+    .wrap{
+      max-width:1150px;
+      margin:0 auto;
+      padding:14px 16px 28px;
+      position:relative;
+      z-index:1;
+    }
+
+    .jump{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+      margin:14px auto 22px;
+      padding:10px;
+      max-width:1080px;
+      background:rgba(3,12,16,.55);
+      border:1px solid rgba(34,255,143,.18);
+      border-radius:999px;
+      box-shadow:0 18px 50px rgba(0,0,0,.45);
+      backdrop-filter:blur(10px);
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      color:var(--ink);
+      font-weight:800;
+      font-size:.9rem;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(34,255,143,.22);
+      background:rgba(34,255,143,.08);
+      transition:transform .1s ease, box-shadow .1s ease, filter .1s ease;
+      text-shadow:0 0 14px rgba(34,255,143,.18);
+    }
+    .chip:hover{
+      transform:translateY(-1px);
+      box-shadow:0 18px 28px rgba(0,0,0,.40);
+      filter:saturate(1.12);
+    }
+
+    .dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+    .dot.money{background:linear-gradient(135deg, var(--gold), var(--amber))}
+    .dot.ops{background:linear-gradient(135deg, var(--neon), var(--neon2))}
+    .dot.frac{background:linear-gradient(135deg, #ff77aa, var(--gold))}
+    .dot.measure{background:linear-gradient(135deg, #7ab8ff, var(--neon2))}
+    .dot.geom{background:linear-gradient(135deg, #a855f7, var(--neon))}
+
+    .toggle-terminal{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+      letter-spacing:.6px;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:2px;
+      padding:8px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,210,78,.40);
+      background:rgba(20, 14, 4, .42);
+      color:rgba(255,247,209,.96);
+      font-weight:900;
+      font-size:.9rem;
+      cursor:pointer;
+      box-shadow:
+        0 14px 26px rgba(0,0,0,.35),
+        0 0 0 1px rgba(255,210,78,.12) inset,
+        0 0 18px rgba(255,210,78,.12);
+      text-shadow:0 0 14px rgba(255,210,78,.18);
+      transition:transform .1s ease, box-shadow .1s ease, filter .1s ease, border-color .1s ease;
+    }
+    .toggle-terminal .label{display:inline-block; min-width:11.5ch; text-align:left}
+    .toggle-terminal:hover{
+      transform:translateY(-1px);
+      box-shadow:
+        0 20px 34px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,210,78,.18) inset,
+        0 0 24px rgba(255,210,78,.18);
+    }
+    .toggle-terminal.off{
+      border-color:rgba(148,163,184,.35);
+      background:rgba(2, 10, 12, .40);
+      color:rgba(226,232,240,.85);
+      text-shadow:none;
+      box-shadow:
+        0 14px 26px rgba(0,0,0,.35),
+        0 0 0 1px rgba(148,163,184,.10) inset;
+    }
+    .cursor{
+      display:inline-block;
+      margin-left:2px;
+      opacity:1;
+      animation: blink 1s steps(2, end) infinite;
+    }
+    .toggle-terminal.off .cursor{opacity:.4}
+    @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+
+    .hero{
+      margin:0 auto 20px;
+      max-width:1080px;
+      padding:16px;
+      border-radius:22px;
+      border:1px solid rgba(255,210,78,.18);
+      background:rgba(10,18,14,.58);
+      backdrop-filter:blur(10px);
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset:0 0 auto 0;
+      height:6px;
+      background:linear-gradient(135deg, rgba(255,210,78,.95), rgba(34,255,143,.75));
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:14px;
+      align-items:center;
+    }
+    @media (max-width: 860px){
+      .hero-grid{grid-template-columns:1fr}
+    }
+    .hero h2{
+      margin:6px 0 8px;
+      font-size:1.18rem;
+    }
+    .hero p{
+      margin:0;
+      color:rgba(201,255,231,.88);
+      line-height:1.4;
+      font-size:.96rem;
+    }
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    @media (max-width: 860px){
+      .hero-actions{justify-content:flex-start}
+    }
+
+    .section{margin:22px 0 28px}
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 14px 12px;
+      border-radius:18px;
+      border:1px solid rgba(34,255,143,.20);
+      background:rgba(2,10,12,.62);
+      backdrop-filter:blur(10px);
+      box-shadow:0 18px 55px rgba(0,0,0,.45);
+      margin-bottom:14px;
+    }
+    .section-title{
+      margin:0;
+      font-size:1.15rem;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      text-shadow:0 0 16px rgba(34,255,143,.20);
+    }
+    .section-sub{
+      margin:4px 0 0;
+      color:rgba(143,255,200,.85);
+      font-size:.92rem;
+      font-weight:500;
+    }
+    .section-tag{
+      font-size:.8rem;
+      font-weight:900;
+      color:rgba(143,255,200,.90);
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(34,255,143,.22);
+      background:rgba(34,255,143,.08);
+      white-space:nowrap;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(265px,1fr));
+      gap:16px;
+    }
+
+    .card{
+      position:relative;
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:16px;
+      border:1px solid var(--cardLine);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      backdrop-filter:blur(10px);
+    }
+    .card:hover{
+      transform:translateY(-2px);
+      filter:saturate(1.08);
+      box-shadow:0 26px 75px rgba(0,0,0,.60);
+    }
+
+    .card::before{
+      content:"";
+      position:absolute; inset:0 0 auto 0;
+      height:6px;
+      background:linear-gradient(135deg, rgba(34,255,143,.95), rgba(0,229,255,.75));
+    }
+    .card.money::before{background:linear-gradient(135deg, rgba(255,210,78,.95), rgba(255,159,31,.80), rgba(34,255,143,.70))}
+    .card.frac::before{background:linear-gradient(135deg, rgba(255,119,170,.92), rgba(255,210,78,.75))}
+    .card.measure::before{background:linear-gradient(135deg, rgba(122,184,255,.92), rgba(0,229,255,.72))}
+    .card.geom::before{background:linear-gradient(135deg, rgba(168,85,247,.90), rgba(34,255,143,.82))}
+
+    .card::after{
+      content:"";
+      position:absolute; inset:-120px -80px auto auto;
+      width:320px; height:220px;
+      transform: rotate(18deg);
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(34,255,143,.10),
+          rgba(34,255,143,.10) 1px,
+          transparent 1px,
+          transparent 9px
+        );
+      opacity:.35;
+      pointer-events:none;
+      mix-blend-mode:screen;
+      border-radius:18px;
+    }
+
+    .card h3{
+      margin:6px 0 6px;
+      font-size:1.03rem;
+      letter-spacing:.2px;
+    }
+    .card p{
+      margin:0 0 10px;
+      color:rgba(215,255,233,.82);
+      font-size:.95rem;
+      line-height:1.35;
+    }
+
+    .badges{display:flex; gap:6px; flex-wrap:wrap; margin:10px 0 12px}
+    .badge{
+      font-size:.75rem;
+      font-weight:900;
+      padding:3px 10px;
+      border-radius:999px;
+      border:1px solid rgba(34,255,143,.18);
+      background:rgba(34,255,143,.06);
+      color:rgba(215,255,233,.92);
+      text-shadow:0 0 10px rgba(34,255,143,.10);
+    }
+    .badge.money{border-color:rgba(255,210,78,.30); background:rgba(255,210,78,.10); color:#fff8d8}
+    .badge.math{border-color:rgba(0,229,255,.25); background:rgba(0,229,255,.08)}
+    .badge.ready{border-color:rgba(253,224,71,.35); background:rgba(253,224,71,.08); color:#fff7cc}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 12px;
+      border-radius:14px;
+      border:1px solid var(--btnLine);
+      text-decoration:none;
+      color:var(--ink);
+      background:var(--btnBg);
+      font-weight:900;
+      font-size:.9rem;
+      transition:transform .08s ease, box-shadow .08s ease, filter .08s ease;
+      box-shadow:0 14px 26px rgba(0,0,0,.35);
+    }
+    .btn:hover{transform:translateY(-1px); box-shadow:0 20px 34px rgba(0,0,0,.45); filter:saturate(1.12)}
+    .btn:active{transform:translateY(0)}
+    .btn.primary{
+      color:#11210d;
+      border-color:transparent;
+      background:linear-gradient(135deg, rgba(255,210,78,.96), rgba(34,255,143,.72));
+      text-shadow:none;
+    }
+
+    .pill-sls{
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:.78rem; font-weight:1000;
+      background:var(--yellow);
+      border:1px solid var(--yellowLine);
+      color:#1f2937;
+      padding:7px 10px;
+      border-radius:999px;
+      text-decoration:none;
+      box-shadow:0 18px 30px rgba(245,158,11,.20);
+      transition:transform .08s ease, box-shadow .08s ease, filter .08s ease;
+    }
+    .pill-sls:hover{transform:translateY(-1px); box-shadow:0 24px 34px rgba(245,158,11,.25); filter:saturate(1.05)}
+
+    .note{
+      margin-top:10px;
+      font-size:.86rem;
+      color:rgba(143,255,200,.80);
+      line-height:1.35;
+    }
+
+    footer{
+      max-width:1150px;
+      margin:30px auto 24px;
+      color:rgba(143,255,200,.85);
+      font-size:.92rem;
+      padding:0 16px;
+      text-align:center;
+      text-shadow:0 0 14px rgba(34,255,143,.12);
+      position:relative;
+      z-index:1;
+    }
+    footer a{color:inherit}
+    footer img{vertical-align:middle;margin-left:10px}
+
+    .anchor{scroll-margin-top:18px}
+
+    @media (prefers-reduced-motion: reduce){
+      .btn,.chip,.card,.toggle-terminal{transition:none}
+      .cursor{animation:none}
+    }
+  </style>
+
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-6Z848TQ1P2"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-6Z848TQ1P2');
+  </script>
+  <script src="https://cdn.counter.dev/script.js" data-id="825e93b6-ce99-40ef-8bcc-125f13297433" data-utcoffset="8"></script>
+</head>
+
+<body>
+  <canvas id="rain" aria-hidden="true"></canvas>
+
+  <header>
+    <h1>Lim Kim Sze — P3 Mathematics Hub</h1>
+    <p>A P3-only gallery of my interactive mathematics tools.</p>
+
+    <nav class="jump" aria-label="Jump to sections">
+      <a class="chip" href="#money"><span class="dot money"></span> Money</a>
+      <a class="chip" href="#operations"><span class="dot ops"></span> Operations</a>
+      <a class="chip" href="#fractions"><span class="dot frac"></span> Fractions</a>
+      <a class="chip" href="#measurement"><span class="dot measure"></span> Measurement</a>
+      <a class="chip" href="#geometry"><span class="dot geom"></span> Geometry</a>
+
+      <button class="toggle-terminal" id="rainToggle" type="button" aria-pressed="true">
+        <span class="label">MONEY::TRUE</span><span class="cursor" aria-hidden="true">_</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <h2>💰 Suggested P3 learning flow for Money!</h2>
+          <p>
+            Start with <b>Saving Quest</b>, then practise <b>Addition of Money</b> and
+            <b>Subtraction of Money</b>, and finish with <b>Money Word Problems</b>.
+            You can also revise Numbers to 10,000, Addition and Subtraction or explore Time, Volume, Fractions and Geometry.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Saving_Quest_Making_Money_Up_To_100/" target="_blank" rel="noopener">Start with Saving Quest</a>
+          <a class="btn" href="https://limkimsze-maker.github.io/P3_Money_Word_Problems/" target="_blank" rel="noopener">Go to Word Problems</a>
+        </div>
+      </div>
+    </section>
+
+<!-- ===================== OPERATIONS ===================== -->
+    <section id="operations" class="section anchor">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title"><span class="dot ops"></span> Primary 3 • Operations & Number</h2>
+          <p class="section-sub">Patterns, mental strategies, bar models, and puzzles.</p>
+        </div>
+        <div class="section-tag">P3 Only</div>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <h3>Mental Sum Challenge!</h3>
+          <p>Add and subtract fast using various techniques.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Mental Math</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Mental_Sum_Challenge/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Mental_Sum_Challenge/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for practising adding and subtracting mentally.</div>
+        </article>
+
+	<article class="card">
+          <h3>Forming Odd or Even Numbers using Digits</h3>
+          <p>Forming Odd or Even Numbers using Digits</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Math</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/forming_even_or_odd_greatest_or_smallest_digit-/" target="_blank" rel="noopener">Open</a>
+          </div>
+          <div class="note">Good for practising forming odd or even numbers with digits.</div>
+        </article>
+
+        
+        <article class="card">
+          <h3>Comparing and Ordering Using Number Line</h3>
+          <p>Comparing and Ordering Using Number Line</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Mental Math</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P1_to_P3_Comparing_and_Ordering_Number_Using_a_Number_Line/" target="_blank" rel="noopener">Open</a>
+            </div>
+          <div class="note">Good for practising comparing and ordering number!</div>
+        </article>
+
+        <article class="card">
+          <h3>Addition and Subtraction</h3>
+          <p>Add and subtract</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Math</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn" href="https://limkimsze-maker.github.io/P1_to_P3_Addition_and_Subtraction/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for practising adding and subtracting.</div>
+        </article>
+        <article class="card">
+          <h3>P3 Addition and Subtraction Puzzles</h3>
+          <p>P3 addition and subtraction puzzles. Teacher's Guide password is <b>0000</b>.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Puzzles</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/Addition-and-Subtraction-Puzzles/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/Addition-and-Subtraction-Puzzles/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/4c1d41c5-4398-449b-81f3-e193550737e0/section/97233912/activity/97233913?pageNo=1" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">Password to unlock Guide for Teachers is “0000”.</div>
+        </article>
+
+        <article class="card">
+          <h3>P3 Number Pattern</h3>
+          <p>P3 More/Less Adventure &amp; Train Sequence.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Number Pattern</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_number_pattern/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_number_pattern/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/ccfc54b3-85c1-4fd6-8deb-33b052063d2b" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">Good for teaching purposes. Pupils can retry as many times as they like.</div>
+        </article>
+
+        <article class="card">
+          <h3>P3 Sum and Difference</h3>
+          <p>Practise sum and difference quickly.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Bar Model</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/Sum_Difference_FillBlank/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/Sum_Difference_FillBlank/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/92ffee00-6d78-4ea5-a6de-43675b6c45b2" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">Good for speed dash. Pupils can retry as many times as they like.</div>
+        </article>
+
+        <article class="card">
+          <h3>P3 Sum and Difference Modelling</h3>
+          <p>Use models to understand sum and difference.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Bar Model</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Sum_and_Difference_Model/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Sum_and_Difference_Model/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for teaching models. Website is embeddable in SLS.</div>
+        </article>
+      </div>
+    </section>
+
+
+    <!-- ===================== MONEY ===================== -->
+    <section id="money" class="section anchor">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title"><span class="dot money"></span> Primary 3 • Money</h2>
+          <p class="section-sub">Money sense, addition, subtraction, and word problems.</p>
+        </div>
+        <div class="section-tag">P3 Only</div>
+      </div>
+
+      <div class="grid">
+         <article class="card money">
+          <h3>Counting Money</h3>
+          <p>Practise Counting Money.</p>
+          <div class="badges">
+            <span class="badge money">Money</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P2_Counting_Money/" target="_blank" rel="noopener">Open</a>
+            </div>
+          <div class="note">Good for practising counting money. Website is embeddable in SLS.</div>
+        </article>
+
+        <article class="card money">
+          <h3>Money Conversion</h3>
+          <p>Money Conversion.</p>
+          <div class="badges">
+            <span class="badge money">Money</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P2_Money_Conversion/" target="_blank" rel="noopener">Open</a>
+            </div>
+          <div class="note">Good for practising converting money.</div>
+        </article>
+
+
+        <article class="card money">
+          <h3>Saving Quest! — Making 1 dollar, 10 dollars and 100 dollars</h3>
+          <p>Practise building amounts up to $100 using coins and notes.</p>
+          <div class="badges">
+            <span class="badge money">Money</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Saving_Quest_Making_Money_Up_To_100/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Saving_Quest_Making_Money_Up_To_100/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for practising making $1, $10 and $100. Website is embeddable in SLS.</div>
+        </article>
+
+        <article class="card money">
+          <h3>Addition of Money</h3>
+          <p>Practise adding money with dollars and cents.</p>
+          <div class="badges">
+            <span class="badge money">Money</span><span class="badge math">Addition</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P1_to_P3_Adding_Money/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P1_to_P3_Adding_Money/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for practising addition of money. Pupils can retry as many times as they like.</div>
+        </article>
+
+        <article class="card money">
+          <h3>Subtraction of Money</h3>
+          <p>Practise subtracting money accurately.</p>
+          <div class="badges">
+            <span class="badge money">Money</span><span class="badge math">Subtraction</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P1_to_P3_Subtracting_Money/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P1_to_P3_Subtracting_Money/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for practising subtraction of money. Pupils can retry as many times as they like.</div>
+        </article>
+
+        <article class="card money">
+          <h3>P3 Money Word Problems</h3>
+          <p>Apply money concepts to problem-solving situations.</p>
+          <div class="badges">
+            <span class="badge money">Money</span><span class="badge math">Word Problems</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Money_Word_Problems/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Money_Word_Problems/" target="_blank" rel="noopener">Source</a>
+          </div>
+          <div class="note">Good for practising money word problems. Website is embeddable in SLS.</div>
+        </article>
+      </div>
+    </section>
+
+    
+    <!-- ===================== FRACTIONS ===================== -->
+    <section id="fractions" class="section anchor">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title"><span class="dot frac"></span> Primary 3 • Fractions</h2>
+          <p class="section-sub">Comparing and ordering unlike fractions.</p>
+        </div>
+        <div class="section-tag">P3 Only</div>
+      </div>
+
+      <div class="grid">
+        <article class="card frac">
+          <h3>P3 Comparing and Ordering Unlike Fractions</h3>
+          <p>P3 comparing and ordering unlike fractions.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Fractions</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Comparing_Unlike_Fraction/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Comparing_Unlike_Fraction/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/b4f9402a-96ce-41d4-a02e-cd8f07f8a944/section/97665230/activity/97665231" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">Pupils can only move on to Test after getting 12/12 for Practice.</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== MEASUREMENT ===================== -->
+    <section id="measurement" class="section anchor">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title"><span class="dot measure"></span> Primary 3 • Measurement</h2>
+          <p class="section-sub">Time duration and measuring volume in millilitres.</p>
+        </div>
+        <div class="section-tag">P3 Only</div>
+      </div>
+
+      <div class="grid">
+        <article class="card measure">
+          <h3>P3 Math Time Duration</h3>
+          <p>Finding out duration using a timeline with instant feedback.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Time</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Time_Duration/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Time_Duration/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/bb54f554-c2d8-4237-bbf1-4ddf7a9ee5f3/section/97233706/activity/97233707" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">This link is ready to embed in SLS.</div>
+        </article>
+
+        <article class="card measure">
+          <h3>P3 Measuring Volumes in Milliliters</h3>
+          <p>P3 measuring volumes in millilitres.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Volume</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Measuring_Volume_In_ml/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Measuring_Volume_In_ml/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/a16b8ac4-52b9-4e85-93c5-a3c1ad412732/section/97233659/activity/97233660?pageNo=1" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">Good for teaching purposes. Pupils can retry as many times as they like.</div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== GEOMETRY ===================== -->
+    <section id="geometry" class="section anchor">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title"><span class="dot geom"></span> Primary 3 • Geometry</h2>
+          <p class="section-sub">Parallel and perpendicular lines.</p>
+        </div>
+        <div class="section-tag">P3 Only</div>
+      </div>
+
+      <div class="grid">
+        <article class="card geom">
+          <h3>P3 Math Parallel &amp; Perpendicular — Draw-Through-C</h3>
+          <p>Identify and draw lines through a point with instant feedback.</p>
+          <div class="badges">
+            <span class="badge math">P3 Math</span><span class="badge">Geometry</span><span class="badge ready">SLS-ready</span>
+          </div>
+          <div class="actions">
+            <a class="btn primary" href="https://limkimsze-maker.github.io/P3_Parallel_Perpendicular_lines/" target="_blank" rel="noopener">Open</a>
+            <a class="btn" href="https://limkimsze-maker.github.io/P3_Parallel_Perpendicular_lines/" target="_blank" rel="noopener">Source</a>
+            <a class="pill-sls" href="https://vle.learning.moe.edu.sg/community-gallery/module/view/41198435-ed4d-4297-8ea8-791a78129de1" target="_blank" rel="noopener">Link to SLS lesson</a>
+          </div>
+          <div class="note">This link is ready to embed in SLS.</div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Designed by Lim Kim Sze © 2026 • Gallery is SLS-embed friendly.
+    <a href="https://hits.sh/limkimsze-maker.github.io/">
+      <img alt="Hits" src="https://hits.sh/limkimsze-maker.github.io.svg?style=for-the-badge&label=Views&color=007ec6" />
+    </a>
+  </footer>
+
+  <script>
+    // Money-style rain with ON/OFF terminal toggle (same canvas logic idea as Matrix rain)
+    (function(){
+      const c = document.getElementById('rain');
+      const btn = document.getElementById('rainToggle');
+      if (!c || !btn) return;
+
+      const labelEl = btn.querySelector('.label');
+      const ctx = c.getContext('2d', { alpha:true });
+
+      let w = 0, h = 0, items = [];
+      let rafId = 0;
+      let running = false;
+      let last = 0;
+
+      function rand(min, max){ return min + Math.random() * (max - min); }
+
+      function resize(){
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        w = Math.floor(window.innerWidth);
+        h = Math.floor(window.innerHeight);
+
+        c.width = Math.floor(w * dpr);
+        c.height = Math.floor(h * dpr);
+        c.style.width = w + "px";
+        c.style.height = h + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        initItems();
+      }
+
+      function makeItem(spawnAnywhere = true){
+        const type = Math.random() < 0.62 ? 'coin' : 'note';
+        const size = type === 'coin' ? rand(14, 24) : rand(28, 46);
+
+        return {
+          type,
+          size,
+          x: rand(-40, w + 40),
+          y: spawnAnywhere ? rand(-h, h) : rand(-h, -40),
+          vy: type === 'coin' ? rand(1.4, 3.0) : rand(1.0, 2.2),
+          vx: rand(-0.18, 0.18),
+          rot: rand(0, Math.PI * 2),
+          vr: rand(-0.03, 0.03),
+          sway: rand(0, Math.PI * 2),
+          swaySpeed: rand(0.015, 0.04),
+          alpha: rand(0.65, 0.95)
+        };
+      }
+
+      function initItems(){
+        const count = Math.max(28, Math.floor(w / 22));
+        items = Array.from({length: count}, () => makeItem(true));
+      }
+
+      function respawnItem(item){
+        Object.assign(item, makeItem(false));
+      }
+
+      function roundRectPath(x, y, ww, hh, r){
+        const rr = Math.min(r, ww/2, hh/2);
+        ctx.beginPath();
+        ctx.moveTo(x + rr, y);
+        ctx.arcTo(x + ww, y, x + ww, y + hh, rr);
+        ctx.arcTo(x + ww, y + hh, x, y + hh, rr);
+        ctx.arcTo(x, y + hh, x, y, rr);
+        ctx.arcTo(x, y, x + ww, y, rr);
+        ctx.closePath();
+      }
+
+      function drawCoin(item){
+        const r = item.size;
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rot);
+        ctx.globalAlpha = item.alpha;
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffd24e';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.lineWidth = Math.max(2, r * 0.16);
+        ctx.strokeStyle = '#ff9f1f';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.70, 0, Math.PI * 2);
+        ctx.lineWidth = Math.max(1.2, r * 0.08);
+        ctx.strokeStyle = '#ffb733';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(-r * 0.24, -r * 0.24, r * 0.22, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,.28)';
+        ctx.fill();
+
+        ctx.fillStyle = '#b86c00';
+        ctx.font = `900 ${Math.floor(r * 1.15)}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('$', 0, 1);
+
+        ctx.restore();
+      }
+
+      function drawNote(item){
+        const ww = item.size * 2.1;
+        const hh = item.size * 1.1;
+
+        ctx.save();
+        ctx.translate(item.x, item.y);
+        ctx.rotate(item.rot);
+        ctx.globalAlpha = item.alpha;
+
+        roundRectPath(-ww/2, -hh/2, ww, hh, ww * 0.10);
+        ctx.fillStyle = '#16c43c';
+        ctx.fill();
+        ctx.lineWidth = Math.max(2, ww * 0.035);
+        ctx.strokeStyle = '#0a6a21';
+        ctx.stroke();
+
+        roundRectPath(-ww*0.39, -hh*0.30, ww*0.78, hh*0.60, ww * 0.08);
+        ctx.lineWidth = Math.max(1.2, ww * 0.016);
+        ctx.strokeStyle = '#0a6a21';
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.ellipse(0, 0, ww * 0.16, hh * 0.24, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#0a6a21';
+        ctx.fill();
+
+        const cr = ww * 0.055;
+        const pts = [
+          [-ww*0.34, -hh*0.22],
+          [ ww*0.34, -hh*0.22],
+          [-ww*0.34,  hh*0.22],
+          [ ww*0.34,  hh*0.22]
+        ];
+        ctx.fillStyle = '#0a6a21';
+        pts.forEach(([px, py]) => {
+          ctx.beginPath();
+          ctx.arc(px, py, cr, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = '#063d14';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        ctx.font = `900 ${Math.floor(ww * 0.17)}px Arial`;
+        ctx.fillText('$', 0, 1);
+
+        ctx.font = `900 ${Math.floor(ww * 0.07)}px Arial`;
+        pts.forEach(([px, py]) => ctx.fillText('$', px, py));
+
+        ctx.restore();
+      }
+
+      function clearCanvas(){
+        ctx.clearRect(0, 0, w, h);
+      }
+
+      function frame(t){
+        if (!running) return;
+
+        if (t - last < 25) {
+          rafId = requestAnimationFrame(frame);
+          return;
+        }
+        last = t;
+
+        // fade for trailing motion
+        ctx.fillStyle = "rgba(2, 6, 10, 0.16)";
+        ctx.fillRect(0, 0, w, h);
+
+        for (const item of items){
+          item.sway += item.swaySpeed;
+          item.x += item.vx + Math.sin(item.sway) * 0.25;
+          item.y += item.vy;
+          item.rot += item.vr;
+
+          if (item.y > h + 80 || item.x < -120 || item.x > w + 120){
+            respawnItem(item);
+          }
+
+          if (item.type === 'coin') drawCoin(item);
+          else drawNote(item);
+        }
+
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function setButtonState(on){
+        btn.classList.toggle('off', !on);
+        btn.setAttribute('aria-pressed', String(on));
+        if (labelEl) labelEl.textContent = on ? 'MONEY::TRUE' : 'MONEY::FALSE';
+      }
+
+      function start(){
+        if (running) return;
+        c.style.display = "block";
+        resize();
+        running = true;
+        rafId = requestAnimationFrame(frame);
+      }
+
+      function stop(){
+        running = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        rafId = 0;
+        c.style.display = "none";
+        clearCanvas();
+      }
+
+      function setEnabled(on){
+        localStorage.setItem('moneyRainEnabled', on ? '1' : '0');
+        if (on) start(); else stop();
+        setButtonState(on);
+      }
+
+      const saved = localStorage.getItem('moneyRainEnabled');
+      const enabled = (saved === null) ? true : (saved === '1');
+
+      btn.addEventListener('click', () => setEnabled(!running));
+      window.addEventListener('resize', () => { if (running) resize(); }, { passive:true });
+
+      setButtonState(enabled);
+      if (enabled) start(); else stop();
+    })();
+  </script>
+</body>
+</html>
